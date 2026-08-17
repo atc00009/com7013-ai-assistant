@@ -109,10 +109,12 @@ if prompt := st.chat_input("Ask about VLSM, ACLs, DMZ, SSH hardening, or report 
         st.write(prompt)
 
     # Active Groq Models (Updated for production stability)
+    # Note: llama-3.2-11b-vision-instruct was removed - it does not exist on Groq
+    # and a vision model isn't needed here since this app is text-only.
     PRIMARY_AND_FALLBACK_MODELS = [
         "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
-        "llama-3.2-11b-vision-instruct"
+        "openai/gpt-oss-120b"
     ]
 
     bot_reply = None
