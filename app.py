@@ -108,17 +108,34 @@ if prompt := st.chat_input("Ask about VLSM, ACLs, DMZ, SSH hardening, or report 
     with st.chat_message("user"):
         st.write(prompt)
 
-    try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  # Updated supported model
-            messages=st.session_state.messages,
-            temperature=0.4,
-            max_tokens=2048
-        )
+    # List of models in order of priority (Fallback Mechanism)
+    PRIMARY_AND_FALLBACK_MODELS = [
+        "llama-3.1-70b-versatile",
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768"
+    ]
 
-        bot_reply = response.choices[0].message.content
+    bot_reply = None
+    last_error = None
+
+    # Try each model sequentially until one succeeds
+    for model_name in PRIMARY_AND_FALLBACK_MODELS:
+        try:
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=st.session_state.messages,
+                temperature=0.4,
+                max_tokens=2048
+            )
+            bot_reply = response.choices[0].message.content
+            break  # Exit loop on success
+        except Exception as e:
+            last_error = e
+            continue
+
+    if bot_reply:
         st.session_state.messages.append({"role": "assistant", "content": bot_reply})
         with st.chat_message("assistant"):
             st.write(bot_reply)
-    except Exception as e:
-        st.error(f"Error communicating with Groq API: {str(e)}")
+    else:
+        st.error(f"Error communicating with Groq API across all fallback models. Last error: {str(last_error)}")
