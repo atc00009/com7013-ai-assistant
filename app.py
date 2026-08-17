@@ -108,17 +108,17 @@ if prompt := st.chat_input("Ask about VLSM, ACLs, DMZ, SSH hardening, or report 
     with st.chat_message("user"):
         st.write(prompt)
 
-    # List of models in order of priority (Fallback Mechanism)
+    # Active Groq Models (Updated for production stability)
     PRIMARY_AND_FALLBACK_MODELS = [
-        "llama-3.1-70b-versatile",
+        "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768"
+        "llama-3.2-11b-vision-instruct"
     ]
 
     bot_reply = None
     last_error = None
 
-    # Try each model sequentially until one succeeds
+    # Try each active model sequentially
     for model_name in PRIMARY_AND_FALLBACK_MODELS:
         try:
             response = client.chat.completions.create(
