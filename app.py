@@ -9,11 +9,11 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize Groq Client
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+# Initialize Groq Client (Checks both Streamlit Secrets and System Environment)
+GROQ_API_KEY = st.secrets.get("GROQ_API_KEY") or os.environ.get("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
-    st.error("⚠️ GROQ_API_KEY environment variable is not set. Please add it in Render Settings.")
+    st.error("⚠️ GROQ_API_KEY is not set. Please add GROQ_API_KEY under App Settings -> Secrets in Streamlit Cloud.")
     st.stop()
 
 client = Groq(api_key=GROQ_API_KEY)
@@ -110,7 +110,7 @@ if prompt := st.chat_input("Ask about VLSM, ACLs, DMZ, SSH hardening, or report 
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.3-70b-versatile",  # Updated supported model
             messages=st.session_state.messages,
             temperature=0.4,
             max_tokens=2048
